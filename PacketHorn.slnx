@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PacketHorn.Capture/PacketHorn.Capture.csproj" />
+    <Project Path="src/PacketHorn.CLI/PacketHorn.CLI.csproj" />
+    <Project Path="src/PacketHorn.Core/PacketHorn.Core.csproj" />
+    <Project Path="src/PacketHorn.Detection/PacketHorn.Detection.csproj" />
+    <Project Path="src/PacketHorn.Output/PacketHorn.Output.csproj" />
+    <Project Path="src/PacketHorn.Platform/PacketHorn.Platform.csproj" />
+    <Project Path="src/PacketHorn.Processing/PacketHorn.Processing.csproj" />
+    <Project Path="src/PacketHorn.Response/PacketHorn.Response.csproj" />
+  </Folder>
+</Solution>

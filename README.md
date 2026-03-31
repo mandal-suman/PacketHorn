@@ -159,7 +159,7 @@ PacketHorn.Core         shared models, contracts, enums, pipeline primitives
 
 | Library | Purpose |
 |---|---|
-| [Npcap](https://github.com/nmap/npcap) + [SharpPcap](https://github.com/chmorgan/sharppcap) | Raw packet capture |
+| [Npcap](https://github.com/nmap/npcap) | Raw packet capture |
 | [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) | Terminal dashboard |
 | [QuestPDF](https://github.com/QuestPDF/QuestPDF) | PDF report generation |
 

@@ -1,4 +1,9 @@
 NAME | PROTOCOL | DIRECTION | WINDOW_SEC | THRESHOLD | METRIC | GROUP_BY | SEVERITY | DESCRIPTION
-SYN_FLOOD | TCP | INBOUND | 10 | 100 | PACKET_COUNT | SRC_IP | HIGH | High SYN packet rate from single source
-PORT_SCAN | TCP | INBOUND | 5 | 20 | UNIQUE_DST_PORTS | SRC_IP | HIGH | Multiple ports targeted rapidly
-UDP_FLOOD | UDP | INBOUND | 10 | 200 | PACKET_COUNT | SRC_IP | MEDIUM | Excessive UDP packets
+SYN_FLOOD_CONFIRMED | TCP | INBOUND | 10 | 120 | PACKET_COUNT | SRC_IP | HIGH | Sustained high-rate TCP SYN behavior from one source indicates flood activity
+PORT_SCAN_BROAD | TCP | INBOUND | 15 | 30 | UNIQUE_DST_PORTS | SRC_IP | HIGH | Single source targeting many destination ports in short interval indicates scan behavior
+UDP_BURST_ANOMALY | UDP | INBOUND | 10 | 260 | PACKET_COUNT | SRC_IP | MEDIUM | Abnormally high UDP packet rate from one source beyond normal client burst patterns
+SMB_LATERAL_PATTERN | TCP | INBOUND | 30 | 18 | PACKET_COUNT | SRC_IP | MEDIUM | Repeated SMB touchpoints from one source suggest lateral movement attempts
+RDP_BRUTE_PATTERN | TCP | INBOUND | 30 | 15 | PACKET_COUNT | SRC_IP | MEDIUM | Repeated RDP attempts in short window suggest credential brute force behavior
+DNS_HEAVY_SOURCE | UDP | OUTBOUND | 30 | 180 | PACKET_COUNT | SRC_IP | LOW | Elevated DNS query generation from single endpoint for early investigation
+CONNECTION_VOLUME_NOTICE | TCP | OUTBOUND | 60 | 250 | CONNECTION_COUNT | SRC_IP | LOW | High outbound connection volume baseline drift event
+TRAFFIC_BASELINE_INFO | ANY | BOTH | 120 | 500 | PACKET_COUNT | SRC_IP | INFO | Informational baseline marker for sustained active network endpoints

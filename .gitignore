@@ -1,35 +1,54 @@
-bin/
-obj/
+# Build artifacts
+**/bin/
+**/obj/
 out/
+
+# IDE/tooling
 .vs/
 .vscode/
+.idea/
+*.sln.iml
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
-.idea/
-*.sln.iml
-.DS_Store
-Thumbs.db
-logs/
-*.log
-outputs/
-outputs/pcap/
-outputs/reports/
-*.tmp
-*.temp
-*.cache
+
+# Package artifacts
 *.nupkg
 *.snupkg
 .nuget/
 packages/
+
+# Test and coverage
 TestResults/
 coverage/
-appsettings.Development.json
-appsettings.Local.json
-*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime logs and temporary files
+*.log
+scripts/*.log
+*.tmp
+*.temp
+*.cache
 *.swp
 *.bak
 *~
+
+# Environment-specific local files
+appsettings.Development.json
+appsettings.Local.json
+*.env
+
+# Node artifacts (if tooling is used)
 node_modules/
-scripts/*.log
+
+# PacketHorn runtime outputs (keep folders via .gitkeep if present)
+logs/*
+!logs/.gitkeep
+outputs/pcap/*
+!outputs/pcap/.gitkeep
+outputs/reports/*
+!outputs/reports/.gitkeep

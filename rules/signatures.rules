@@ -1,4 +1,11 @@
 NAME | PROTOCOL | DIRECTION | SRC_IP | DST_IP | PORT | FLAG_MATCH | FLAG_MASK | COUNT | WINDOW_SEC | SEVERITY | DESCRIPTION
-TELNET_ACCESS | TCP | BOTH | ANY | ANY | 23 | 0x00 | 0x00 | 1 | 1 | MEDIUM | Telnet usage detected
-SYN_ONLY_PACKET | TCP | INBOUND | ANY | ANY | ANY | 0x02 | 0x12 | 50 | 10 | HIGH | SYN packets without ACK pattern
-BLACKLISTED_IP | ANY | INBOUND | 192.168.1.100 | ANY | ANY | 0x00 | 0x00 | 1 | 1 | CRITICAL | Known attacker IP
+DNS_AMP_VECTOR | UDP | INBOUND | ANY | ANY | 53 | 0x00 | 0x00 | 120 | 10 | HIGH | High-rate inbound UDP/53 pattern typical of reflected DNS amplification traffic
+NTP_AMP_VECTOR | UDP | INBOUND | ANY | ANY | 123 | 0x00 | 0x00 | 120 | 10 | HIGH | High-rate inbound UDP/123 pattern typical of reflected NTP amplification traffic
+SSDP_AMP_VECTOR | UDP | INBOUND | ANY | ANY | 1900 | 0x00 | 0x00 | 100 | 10 | HIGH | High-rate inbound UDP/1900 pattern typical of reflected SSDP amplification traffic
+SYN_STORM_SINGLE_SRC | TCP | INBOUND | ANY | ANY | ANY | 0x02 | 0x12 | 80 | 10 | HIGH | Sustained SYN without ACK from single flow suggests handshake abuse
+RDP_PUBLIC_EXPOSURE | TCP | INBOUND | ANY | ANY | 3389 | 0x00 | 0x00 | 20 | 30 | MEDIUM | Repeated inbound RDP connection attempts indicate brute-force probing
+SMB_REMOTE_PROBE | TCP | INBOUND | ANY | ANY | 445 | 0x00 | 0x00 | 20 | 30 | MEDIUM | Repeated inbound SMB connection attempts indicate lateral movement probing
+WINRM_REMOTE_PROBE | TCP | INBOUND | ANY | ANY | 5985 | 0x00 | 0x00 | 20 | 30 | MEDIUM | Repeated inbound WinRM access attempts indicate management-plane probing
+TELNET_USAGE_DEPRECATED | TCP | BOTH | ANY | ANY | 23 | 0x00 | 0x00 | 5 | 60 | LOW | Telnet traffic observed on network where encrypted management is expected
+FTP_CLEAR_CONTROL | TCP | BOTH | ANY | ANY | 21 | 0x00 | 0x00 | 10 | 60 | LOW | FTP control-channel traffic observed, indicating cleartext credential risk
+ICMP_REACHABILITY_BASELINE | ICMP | INBOUND | ANY | ANY | ANY | 0x00 | 0x00 | 30 | 60 | INFO | Routine ICMP activity baseline event for visibility without alert fatigue

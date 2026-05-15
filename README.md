@@ -1,176 +1,194 @@
 <div align="center">
 
-<img src="docs/banner.svg" alt="PacketHorn" width="100%"/>
+![PacketHorn Banner](docs/assets/banner.svg)
 
-<br/>
+# PacketHorn
 
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078d4?style=flat-square&logo=windows&logoColor=white) ![.NET](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square&logo=dotnet&logoColor=white) ![Language](https://img.shields.io/badge/language-C%23-239120?style=flat-square&logo=csharp&logoColor=white) ![License](https://img.shields.io/badge/license-MIT-3b9eff?style=flat-square) ![Status](https://img.shields.io/badge/status-active%20development-22c55e?style=flat-square) ![Npcap](https://img.shields.io/badge/capture-Npcap-1a6fc4?style=flat-square) ![Terminal.Gui](https://img.shields.io/badge/UI-Terminal.Gui-0a0f1e?style=flat-square&labelColor=1a1a2e) ![QuestPDF](https://img.shields.io/badge/reports-QuestPDF-e85d24?style=flat-square) ![Admin](https://img.shields.io/badge/requires-Administrator-dc2626?style=flat-square&logo=shield&logoColor=white)
+Terminal-native network detection and response for Windows, built with .NET 10.
+
+PacketHorn captures live traffic through Npcap, normalizes packets into internal models, evaluates them with YAML-based signature and behavior rules, and can apply temporary Windows Firewall blocks based on rule-driven decisions.
+
+<p>
+  <img src="https://img.shields.io/badge/platform-Windows%2010%2F11-0078d4?style=flat-square&logo=windows&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET" />
+  <img src="https://img.shields.io/badge/language-C%23-239120?style=flat-square&logo=csharp&logoColor=white" alt="Language" />
+  <img src="https://img.shields.io/badge/capture-Npcap-1a6fc4?style=flat-square" alt="Npcap" />
+  <img src="https://img.shields.io/badge/UI-Terminal.Gui-0a0f1e?style=flat-square" alt="Terminal.Gui" />
+  <img src="https://img.shields.io/badge/reports-QuestPDF-e85d24?style=flat-square" alt="QuestPDF" />
+  <img src="https://img.shields.io/badge/rules-YAML-2563eb?style=flat-square" alt="YAML Rules" />
+  <img src="https://img.shields.io/badge/license-MIT-334155?style=flat-square" alt="MIT License" />
+</p>
 
 </div>
 
----
+## Why PacketHorn
 
-**Windows network intrusion detection and response — terminal-native, rule-driven and no cloud.**
+PacketHorn is a Windows-focused security engineering project designed to make packet capture, rule-driven detection, and controlled response visible in one operator-facing terminal workflow.
 
-PacketHorn captures live traffic on a selected interface, runs it through a signature and behavior detection engine, and optionally fires short-lived Windows Firewall block rules when threats are confirmed. Everything — captures, detections, and reports — stays local.
+It is currently best understood as:
 
-![PacketHorn Dashboard](docs/dashboard.png)
+- a hands-on detection engineering platform
+- a network systems learning project
+- a local-first response prototype for controlled environments
 
----
+## At a Glance
 
-## What it does
+| Area | Current Implementation |
+|---|---|
+| Capture | Live Windows capture through Npcap and SharpPcap |
+| Interface | Terminal dashboard built with Terminal.Gui |
+| Rules | YAML-based signature and behavior rule sets |
+| Detection | Hybrid signature and stateful behavior evaluation |
+| Response | Rule-driven alerting and temporary Windows Firewall blocking |
+| Exports | PCAP capture files and PDF session reports |
+| Platform | Windows only |
 
-- Captures raw packets via Npcap on any available Windows interface
-- Parses and normalizes TCP, UDP, ICMP, and raw frames in a processing pipeline
-- Evaluates traffic against two rule engines: **signature** (stateless flag/port matching) and **behavior** (sliding-window counters with per-source scope)
-- Classifies threats at five severity levels: Info, Low, Medium, High, Critical
-- Supports three response modes: AlertOnly, InteractiveBlock, AutoBlock
-- In AutoBlock mode, injects timed Windows Firewall rules and removes them automatically on expiry
-- Generates a PDF session report when you trigger Report from the dashboard
-- Writes a Wireshark-compatible `.pcap` file per session
-- Runs entirely in a Terminal.Gui dashboard — no GUI framework, no browser, no external service
+## Feature Snapshot
 
----
+### Capture
 
-## Dashboard
+- Live interface capture on Windows
+- Optional BPF filter support
+- Promiscuous mode support
+- Timestamped PCAP export
 
-The terminal dashboard shows three concurrent views:
+### Detection
 
-- **Packets** — live feed of captured frames with time, protocol, source/destination, size, and TCP flags
-- **Detections** — fired rules with severity, matched source/destination, and confidence score
-- **Events** — timestamped session event log
+- YAML-driven signature and behavior rules
+- Direction inference during normalization
+- Named IP groups such as `@internal`, `@external`, and `@workstations`
+- TCP flag matching, payload matching, and threshold grouping
+- Stateful behavior metrics including unique ports, unique IPs, sessions, DNS FQDN extraction, failed-connection heuristics, and decayed counters
+- MITRE ATT&CK metadata and confidence scoring
 
-Interface selection, mode switching, and capture control are available directly from the dashboard without restarting.
+### Response
 
----
+- `AlertOnly`, `InteractiveBlock`, and `AutoBlock` modes
+- Rule-level action handling with `ALERT`, `BLOCK`, `ALERT_AND_BLOCK`, and `NONE`
+- Temporary Windows Firewall blocking through `netsh`
 
-## Requirements
+### Analyst Outputs
 
-- Windows 10 or 11
-- .NET SDK 10.0 or later
-- [Npcap](https://npcap.com/) installed (WinPcap-compatible mode recommended)
-- Administrator privileges (required for packet capture and firewall response)
+- Live packet and detection views in the dashboard
+- PCAP capture output under `outputs/pcap`
+- PDF session reports under `outputs/reports`
 
----
+## Quick Start
 
-## Quick start
+### Requirements
+
+- Windows 10 or Windows 11
+- .NET SDK 10.x
+- Npcap installed locally
+- Administrator privileges for reliable capture and firewall operations
+
+Recommended Npcap installer options:
+
+- WinPcap compatibility mode
+- Loopback traffic support
+
+### Build
 
 ```powershell
-# Restore and build
 dotnet restore
 dotnet build PacketHorn.slnx
+```
 
-# Launch the dashboard
+### Run
+
+```powershell
 dotnet run --project src/PacketHorn.CLI/PacketHorn.CLI.csproj
 ```
 
-Run as Administrator, or capture and firewall features will be blocked at the OS level.
+Run the terminal as Administrator before starting PacketHorn.
 
-Note: there are currently no command-line flags implemented in `PacketHorn.CLI`; runtime control is provided through the terminal dashboard menu and hotkeys.
+## Runtime Flow
 
----
+```text
+Capture
+  -> Queue
+  -> Parse and Normalize
+  -> Signature Evaluation
+  -> Behavior Evaluation
+  -> Decision
+  -> Response
+  -> Outputs
+```
+
+When a session is started from the dashboard, PacketHorn:
+
+1. Loads `config/packethorn.conf`
+2. Validates the environment and privilege state
+3. Enumerates and selects a capture interface
+4. Loads YAML rules from `rules`
+5. Captures raw packets into a bounded in-memory queue
+6. Builds normalized `StructuredPacket` instances
+7. Evaluates signature and behavior rules
+8. Converts rule results into runtime decisions
+9. Optionally applies Windows Firewall blocks
+10. Writes PCAP output and supports on-demand PDF report generation
+
+## Project Layout
+
+- `src/PacketHorn.CLI`: application entry point and terminal dashboard
+- `src/PacketHorn.Capture`: interface enumeration and live packet capture
+- `src/PacketHorn.Core`: shared models, enums, interfaces, configuration, and pipeline utilities
+- `src/PacketHorn.Processing`: packet normalization and protocol parsing
+- `src/PacketHorn.Detection`: rule loading and detection evaluators
+- `src/PacketHorn.Response`: decisioning and Windows Firewall response execution
+- `src/PacketHorn.Output`: PCAP writing, PDF reports, and output helpers
+- `src/PacketHorn.Platform`: environment and privilege validation
+- `rules`: YAML detection rules
+- `config`: runtime configuration
+- `outputs`: generated PCAP and report artifacts
 
 ## Configuration
 
-All runtime settings live in `config/packethorn.conf`.
+Primary runtime configuration file:
 
-Key options:
+- `config/packethorn.conf`
 
-| Setting | What it controls |
-|---|---|
-| `capture.interface` | Capture interface name, index, or `AUTO` |
-| `capture.promiscuous` | Enable/disable promiscuous capture |
-| `capture.read_timeout_ms` | Capture read timeout in milliseconds |
-| `capture.filter` | BPF-style filter expression |
-| `capture.buffer_queue_size` | Internal packet queue capacity |
-| `detection.mode` | `AlertOnly` / `InteractiveBlock` / `AutoBlock` |
-| `firewall.block_duration_sec` | Block duration setting (currently enforced to 15 seconds at runtime) |
-| `ui.use_tui` | Enable Terminal.Gui dashboard mode |
-| `ui.packet_list_limit` | Max packet rows shown in dashboard |
-| `ui.detection_list_limit` | Max detection rows shown in dashboard |
-| `paths.rules_dir` | Rules directory |
-| `paths.logs_dir` | Runtime log directory |
-| `paths.pcap_dir` | PCAP output directory |
-| `paths.reports_dir` | PDF report output directory |
+Current configuration surface includes:
 
-Use `capture.interface=AUTO` to auto-select a likely primary NIC, or set an exact interface name/index.
+- Capture interface selection
+- Promiscuous mode
+- Read timeout
+- Optional BPF filter
+- Queue size
+- Detection mode
+- Firewall block duration
+- UI row limits
+- Rules, PCAP, report, and log directories
 
----
+## Current Boundaries
 
-## Rules
+PacketHorn currently reflects the following implementation scope:
 
-Detection logic is defined in two plain-text rule files under `rules/`.
+- Windows-only runtime support
+- IPv4-focused normalization
+- TCP and UDP transport parsing, with ICMP protocol classification at the IP layer
+- Local, single-process execution
+- In-memory behavioral state tracking
+- No distributed coordination or central management console
 
-**`signatures.rules`** — stateless, per-packet matching:
-```
-# NAME | PROTOCOL | DIRECTION | SRC_IP | DST_IP | PORT | FLAG_MATCH | FLAG_MASK | COUNT | WINDOW_SEC | SEVERITY | DESCRIPTION
-SMB_REMOTE_PROBE | TCP | INBOUND | ANY | ANY | 445 | 0x00 | 0x00 | 20 | 30 | MEDIUM | Repeated inbound SMB connection attempts indicate lateral movement probing
-SYN_STORM_SINGLE_SRC | TCP | INBOUND | ANY | ANY | ANY | 0x02 | 0x12 | 80 | 10 | HIGH | Sustained SYN without ACK from single flow suggests handshake abuse
-```
+Important implementation note:
 
-**`behaviors.rules`** — stateful, sliding-window counters:
-```
-# NAME | PROTOCOL | DIRECTION | WINDOW_SEC | THRESHOLD | METRIC | GROUP_BY | SEVERITY | DESCRIPTION
-SYN_FLOOD_CONFIRMED | TCP | INBOUND | 10 | 120 | PACKET_COUNT | SRC_IP | HIGH | Sustained high-rate TCP SYN behavior from one source indicates flood activity
-PORT_SCAN_BROAD | TCP | INBOUND | 15 | 30 | UNIQUE_DST_PORTS | SRC_IP | HIGH | Single source targeting many destination ports in short interval indicates scan behavior
-TRAFFIC_BASELINE_INFO | ANY | BOTH | 120 | 500 | PACKET_COUNT | SRC_IP | INFO | Informational baseline marker for sustained active network endpoints
-```
+- The repository includes a runtime file logger component, but the current terminal dashboard flow does not actively persist dashboard events into log files.
 
-Rules are loaded when capture starts. Restart capture after editing rule files.
+## Documentation
 
----
+- [Onboarding](docs/ONBOARDING.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Rules](docs/RULES.md)
+- [Operations](docs/OPERATIONS.md)
+- [Contributing](docs/CONTRIBUTING.md)
+- [Changelog](docs/CHANGELOG.md)
+- [Release Notes](docs/RELEASE_NOTES.md)
 
-## Output
+## Security Notice
 
-During a capture session, PacketHorn writes PCAP output. PDF reports are generated on demand from the dashboard.
-
-Configured output paths (defaults shown):
-
-```
-./logs/            runtime logs directory
-./outputs/pcap/    .pcap files (Wireshark-compatible)
-./outputs/reports/ PDF session reports
-```
-
-Reports include a packet volume breakdown by protocol, a ranked list of alert sources, and a full detection timeline.
-
----
-
-## Architecture
-
-PacketHorn is split into focused modules. Business logic does not live in the CLI project.
-
-```
-PacketHorn.CLI          entry point and Terminal.Gui dashboard
-PacketHorn.Capture      capture interfaces and Npcap device integration
-PacketHorn.Processing   packet parsing and frame normalization
-PacketHorn.Detection    rule loading, signature engine, behavior engine
-PacketHorn.Response     decision logic and Windows Firewall orchestration
-PacketHorn.Output       session logging, PCAP writing, PDF report generation
-PacketHorn.Platform     environment validation (OS, privileges, Npcap presence)
-PacketHorn.Core         shared models, contracts, enums, pipeline primitives
-```
-
-![PacketHorn Dashboard](docs/architecture-v1.0.0.png)
-
----
-
-## Dependencies
-
-| Library | Purpose |
-|---|---|
-| [Npcap](https://github.com/nmap/npcap) | Raw packet capture |
-| [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) | Terminal dashboard |
-| [QuestPDF](https://github.com/QuestPDF/QuestPDF) | PDF report generation |
-
----
-
-## Security note
-
-PacketHorn is a detection and response tool. Test rule files in `AlertOnly` mode before enabling `AutoBlock` on any network you do not fully control. Miscalibrated behavior rules on a busy network will produce false positives. Whitelist your gateway, DNS resolver, and any monitoring hosts before enabling firewall response.
-
----
+PacketHorn can apply live firewall blocks. Start with `AlertOnly`, validate rules in a controlled environment, and review false positives before enabling automated blocking.
 
 ## License
 
-MIT — see `LICENSE`.
+PacketHorn is released under the MIT License. See [LICENSE](LICENSE).

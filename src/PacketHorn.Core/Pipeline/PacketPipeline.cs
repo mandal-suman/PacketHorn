@@ -51,7 +51,6 @@ public class PacketPipeline
             {
                 OnStructuredPacket?.Invoke(this, new StructuredPacketEventArgs { Packet = structuredPacket });
 
-                // Evaluate rules if engine is configured
                 if (_ruleEngine != null)
                 {
                     var detections = _ruleEngine.EvaluatePacket(structuredPacket);
@@ -68,9 +67,6 @@ public class PacketPipeline
     }
 }
 
-/// <summary>
-/// Event args for detection matches.
-/// </summary>
 public class DetectionEventArgs : EventArgs
 {
     public DetectionMatch? Detection { get; set; }

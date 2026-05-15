@@ -6,10 +6,36 @@ namespace PacketHorn.Response.Decision;
 
 public class DecisionEngine : IDecisionEngine
 {
-    public PacketHorn.Core.Models.Decision Evaluate(DetectionResult detectionResult, DecisionMode mode)
+    public PacketHorn.Core.Models.Decision Evaluate(DetectionMatch detectionMatch, DecisionMode mode)
     {
+        var detectionResult = detectionMatch.Result;
+        if (detectionResult == null)
+        {
+            return new PacketHorn.Core.Models.Decision
+            {
+                Mode = mode,
+                Action = ResponseAction.Ignore,
+                Reason = "Detection payload missing",
+                RequiresOperatorApproval = false
+            };
+        }
+
         var sourceIp = detectionResult.SourceIP;
-        var shouldBlock = detectionResult.SeverityLevel >= SeverityLevel.High && !string.IsNullOrWhiteSpace(sourceIp);
+        var blockRequested = detectionMatch.Action is RuleAction.Block or RuleAction.AlertAndBlock;
+        var alertRequested = detectionMatch.Action is RuleAction.Alert or RuleAction.AlertAndBlock;
+        var canBlock = !string.IsNullOrWhiteSpace(sourceIp);
+
+        if (detectionMatch.Action == RuleAction.None)
+        {
+            return new PacketHorn.Core.Models.Decision
+            {
+                Mode = mode,
+                Action = ResponseAction.Ignore,
+                TargetIP = sourceIp,
+                Reason = "Rule action set to NONE",
+                RequiresOperatorApproval = false
+            };
+        }
 
         return mode switch
         {
@@ -18,31 +44,33 @@ public class DecisionEngine : IDecisionEngine
                 Mode = mode,
                 Action = ResponseAction.AlertOnly,
                 TargetIP = sourceIp,
-                Reason = "AlertOnly mode enabled",
+                Reason = alertRequested || blockRequested
+                    ? "AlertOnly mode suppresses blocking"
+                    : "AlertOnly mode enabled",
                 RequiresOperatorApproval = false
             },
-            DecisionMode.InteractiveBlock when shouldBlock => new PacketHorn.Core.Models.Decision
+            DecisionMode.InteractiveBlock when blockRequested && canBlock => new PacketHorn.Core.Models.Decision
             {
                 Mode = mode,
                 Action = ResponseAction.BlockSourceIP,
                 TargetIP = sourceIp,
-                Reason = "High severity threat requires operator approval",
+                Reason = "Rule requested blocking and operator approval is required",
                 RequiresOperatorApproval = true
             },
-            DecisionMode.AutoBlock when shouldBlock => new PacketHorn.Core.Models.Decision
+            DecisionMode.AutoBlock when blockRequested && canBlock => new PacketHorn.Core.Models.Decision
             {
                 Mode = mode,
                 Action = ResponseAction.BlockSourceIP,
                 TargetIP = sourceIp,
-                Reason = "AutoBlock mode and severity threshold met",
+                Reason = "Rule requested blocking and AutoBlock mode is enabled",
                 RequiresOperatorApproval = false
             },
             _ => new PacketHorn.Core.Models.Decision
             {
                 Mode = mode,
-                Action = ResponseAction.AlertOnly,
+                Action = alertRequested || blockRequested ? ResponseAction.AlertOnly : ResponseAction.Ignore,
                 TargetIP = sourceIp,
-                Reason = "Threat below block threshold",
+                Reason = alertRequested || blockRequested ? "Rule requested alerting only" : "Rule action suppressed the response",
                 RequiresOperatorApproval = false
             }
         };

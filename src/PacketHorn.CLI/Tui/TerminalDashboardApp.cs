@@ -325,7 +325,7 @@ public sealed class TerminalDashboardApp
 
                 AppendDetection(e.Detection);
 
-                var decision = decisionEngine.Evaluate(e.Detection.Result, _currentMode);
+                var decision = decisionEngine.Evaluate(e.Detection, _currentMode);
                 responseEngine.ProcessDecision(decision, e.Detection.Result);
                 UpdateStats();
             };

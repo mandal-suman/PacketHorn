@@ -5,5 +5,5 @@ namespace PacketHorn.Core.Interfaces;
 
 public interface IDecisionEngine
 {
-    Decision Evaluate(DetectionResult detectionResult, DecisionMode mode);
+    Decision Evaluate(DetectionMatch detectionMatch, DecisionMode mode);
 }

@@ -2,23 +2,14 @@ using System;
 
 namespace PacketHorn.Platform;
 
-/// <summary>
-/// Detects the operating system and platform information.
-/// </summary>
 public class PlatformDetector
 {
-    /// <summary>
-    /// Supported operating systems.
-    /// </summary>
     public enum OS
     {
         Windows,
         Unknown
     }
 
-    /// <summary>
-    /// Detects the current operating system.
-    /// </summary>
     public static OS DetectOS()
     {
         if (OperatingSystem.IsWindows())
@@ -26,9 +17,6 @@ public class PlatformDetector
         return OS.Unknown;
     }
 
-    /// <summary>
-    /// Gets the OS name as string.
-    /// </summary>
     public static string GetOSName()
     {
         return DetectOS() switch
@@ -38,17 +26,11 @@ public class PlatformDetector
         };
     }
 
-    /// <summary>
-    /// Gets the current system architecture.
-    /// </summary>
     public static string GetArchitecture()
     {
         return System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString();
     }
 
-    /// <summary>
-    /// Gets OS version information (if available).
-    /// </summary>
     public static string GetOSVersion()
     {
         try

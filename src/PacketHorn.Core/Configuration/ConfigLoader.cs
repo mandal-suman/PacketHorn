@@ -36,9 +36,6 @@ public static class ConfigLoader
     {
         return string.Join(Environment.NewLine, new[]
         {
-            "# PacketHorn Configuration",
-            "# All major runtime settings are controlled here.",
-            "",
             "capture.interface=AUTO",
             $"capture.promiscuous={cfg.Capture.Promiscuous.ToString().ToLowerInvariant()}",
             $"capture.read_timeout_ms={cfg.Capture.ReadTimeoutMs}",
@@ -47,7 +44,6 @@ public static class ConfigLoader
             "",
             $"detection.mode={cfg.Detection.Mode}",
             "",
-            "# Requirement: firewall block must be 15 seconds",
             "firewall.block_duration_sec=15",
             "",
             $"ui.use_tui={cfg.Ui.UseTui.ToString().ToLowerInvariant()}",

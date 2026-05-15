@@ -1,15 +1,8 @@
 using System;
 namespace PacketHorn.Platform;
 
-/// <summary>
-/// Validates environment and required dependencies.
-/// </summary>
 public class EnvironmentValidator
 {
-    /// <summary>
-    /// Validates the environment for packet capture.
-    /// Returns true if all checks pass.
-    /// </summary>
     public static bool ValidateEnvironment(out List<string> warnings, out List<string> errors)
     {
         warnings = new();
@@ -17,20 +10,17 @@ public class EnvironmentValidator
 
         var os = PlatformDetector.DetectOS();
 
-        // Check OS
         if (os == PlatformDetector.OS.Unknown)
         {
             errors.Add("Unknown or unsupported operating system");
             return false;
         }
 
-        // Check privileges (warning only). Capture may still work when Npcap is installed in compatible mode.
         if (!PrivilegeChecker.HasPacketCapturePrivileges())
         {
             warnings.Add(PrivilegeChecker.GetPrivilegeStatus());
         }
 
-        // Check for required drivers/libraries
         if (os == PlatformDetector.OS.Windows)
         {
             ValidateWindowsEnvironment(warnings, errors);
@@ -40,7 +30,6 @@ public class EnvironmentValidator
 
     private static void ValidateWindowsEnvironment(List<string> warnings, List<string> errors)
     {
-        // Check for Npcap installation
         string npcapPath = @"C:\Windows\System32\Npcap";
         if (!Directory.Exists(npcapPath))
         {
@@ -49,7 +38,6 @@ public class EnvironmentValidator
         }
         else
         {
-            // Check for required Npcap DLL
             string npcapDll = Path.Combine(npcapPath, "wpcap.dll");
             if (!File.Exists(npcapDll))
             {
@@ -58,9 +46,6 @@ public class EnvironmentValidator
         }
     }
 
-    /// <summary>
-    /// Gets a full validation report.
-    /// </summary>
     public static string GetValidationReport()
     {
         var result = $"═══════════════════════════════════════════════════════════════\n";

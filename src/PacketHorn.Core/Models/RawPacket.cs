@@ -1,4 +1,5 @@
 using System;
+using PacketHorn.Core.Models;
 
 namespace PacketHorn.Core.Models;
 

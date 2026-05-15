@@ -1,0 +1,317 @@
+signatures:
+  - name: SMB_LATERAL_PROBE
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x02"
+    flag_mask: "0xFF"
+    payload_pattern: ""
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Lateral Movement
+    mitre_technique: T1021.002
+    tags: smb, lateral, ransomware
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      Single SYN to SMB port between internal hosts. Known vector
+      for WannaCry lateral propagation and SMB relay attacks.
+  
+  - name: SMB_NEGOTIATE_POISON
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "SMB|00|"  # SMB header, length 00
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft, ntlmv2
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      SYN-ACK response on port 445 with SMB header, but zero-length payload. 
+      Indicators of SMB relay/poisoning attempts targeting NTLMv2 authentication.
+      Note: This is a heuristic and may require tuning to reduce false positives.
+
+  - name: SMB_NEGOTIATE_NO_DIALECT
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "534D4243"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header but no dialect negotiation. 
+      Some SMB relay tools send incomplete responses.
+
+  - name: ETERNALBLUE_CHECK
+    version: 1
+    protocol: UDP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "445"
+    dst_ip: "@internal"
+    dst_port: "137"
+    payload_pattern: "1801"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Initial Access
+    mitre_technique: T1190
+    tags: eternalblue, exploit, ransomware
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      UDP port 137 packets with '1801' hex prefix. 
+      Likely indicates scanning for EternalBlue vulnerability (MS17-010).
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB2
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "02FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '02FF' SMB2 dialect.
+      Common in SMB relay attacks. May need tuning for false positives.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB3
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "03FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '03FF' SMB3 dialect.
+      Common in SMB relay attacks. May need tuning for false positives.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB1
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "01FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '01FF' SMB1 dialect.
+      Indicates SMB relay or SMB1 traffic, which should be investigated.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB1
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "01FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '01FF' SMB1 dialect.
+      Indicates SMB relay or SMB1 traffic, which should be investigated.
+
+  - name: DCERPC_PORT_SCAN
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "135"
+    flag_match: "0x02"  # SYN
+    flag_mask: "0xFF"
+    payload_pattern: ""
+    count: 1
+    window_sec: 60
+    threshold_mode: PER_SRC
+    mitre_tactic: Discovery
+    mitre_technique: T1047
+    tags: dcerpc, scan, reconnaissance
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      TCP SYN to port 135 from an internal host. DCERPC enumeration is often a precursor to lateral movement.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB1
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "01FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '01FF' SMB1 dialect.
+      Indicates SMB relay or SMB1 traffic, which should be investigated.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB1
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "01FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '01FF' SMB1 dialect.
+      Indicates SMB relay or SMB1 traffic, which should be investigated.
+
+  - name: SMB_NEGOTIATE_DIALECT_SMB1
+    version: 1
+    protocol: TCP
+    direction: LATERAL
+    src_ip: "@internal"
+    src_port: "*"
+    dst_ip: "@internal"
+    dst_port: "445"
+    flag_match: "0x12"  # SYN-ACK
+    flag_mask: "0xFF"
+    payload_pattern: "01FF"
+    payload_pattern_type: HEX
+    count: 1
+    window_sec: 0
+    threshold_mode: PER_SRC
+    mitre_tactic: Credential Access
+    mitre_technique: T1558.003
+    tags: smb, relay, credential_theft
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      SYN-ACK on port 445 with SMB header and '01FF' SMB1 dialect.
+      Indicates SMB relay or SMB1 traffic, which should be investigated.
+
+  - name: SYN_FLOOD_SINGLE_SRC
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "*"
+    dst_ip: "@local"
+    dst_port: "*"
+    flag_match: "0x02"  # SYN
+    flag_mask: "0xFF"
+    payload_pattern: ""
+    count: 500
+    window_sec: 5
+    threshold_mode: PER_SRC
+    mitre_tactic: Impact
+    mitre_technique: T1498
+    tags: dos,tcp,syn
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT
+    description: High-rate inbound SYN packets from single source.

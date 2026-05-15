@@ -9,7 +9,6 @@ public class FeatureExtractor : IFeatureExtractor
 {
     public void ExtractFeatures(StructuredPacket packet)
     {
-        // E.g., entropy calculation, payload size analysis. Place holder implementation for Phase 4.
         if (string.IsNullOrEmpty(packet.Flags))
         {
             packet.Flags = "NONE";

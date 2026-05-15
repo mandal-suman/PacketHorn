@@ -31,7 +31,7 @@ public class PipelineCoordinator
     {
         _isRunning = false;
         _pipeline.Stop();
-        
+
         if (_workerThread != null && _workerThread.IsAlive)
         {
             _workerThread.Join(TimeSpan.FromSeconds(2));

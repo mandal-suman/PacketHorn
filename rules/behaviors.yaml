@@ -1,0 +1,278 @@
+behaviors:
+  - name: PORT_SCAN_SLOW
+    version: 1
+    protocol: TCP
+    direction: OUTBOUND
+    src_ip: "*"
+    dst_ip: "@external"
+    dst_port: "1:1024"
+    window_sec: 60
+    threshold: 30
+    metric: UNIQUE_PORTS
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Reconnaissance
+    mitre_technique: T1046
+    tags: scan, recon, stealth
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      Single source contacting 30+ unique privileged ports on external
+      hosts within 60 seconds. Consistent with slow reconnaissance
+      tooling designed to evade per-second threshold detection.
+
+  - name: DNSpam
+    version: 1
+    protocol: UDP
+    direction: OUTBOUND
+    src_ip: "*"
+    dst_ip: "@external"
+    dst_port: "53"
+    window_sec: 60
+    threshold: 15
+    metric: UNIQUE_FQDNs
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Command and Control
+    mitre_technique: T1071.004
+    tags: dns, command_and_control, malware
+    severity: MEDIUM
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Single source contacting 15+ unique FQDNs over UDP port 53 within 60 seconds.
+      Indicates potential DNS beaconing or data exfiltration.
+
+  - name: RDP_ANOMALY
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@internal"
+    dst_port: "3389"
+    window_sec: 60
+    threshold: 5
+    metric: UNIQUE_SRC_IPS
+    group_by: DST_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Initial Access
+    mitre_technique: T1133
+    tags: rdp, brute_force, external_access
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      Multiple distinct external IPs attempting RDP connections to the same internal host
+      within 60 seconds. Indicates targeted brute-force or exploitation attempts.
+
+  - name: PING_SWEEP
+    version: 1
+    protocol: ICMP
+    direction: OUTBOUND
+    src_ip: "*"
+    dst_ip: "@internal"
+    dst_port: "*"
+    window_sec: 10
+    threshold: 20
+    metric: UNIQUE_DST_IPS
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Reconnaissance
+    mitre_technique: T1046
+    tags: icmp, recon, network_mapping
+    severity: MEDIUM
+    confidence: MEDIUM
+    action: ALERT
+    description: >
+      Single source ICMP Echo Requests to 20+ unique internal hosts within 10 seconds.
+      Common pattern for network discovery and host enumeration.
+
+  - name: EXE_FROM_JAVA
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@internal"
+    dst_port: "54979"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: DST_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Persistence
+    mitre_technique: T1547.001
+    tags: java, persistent_mechanism, suspicious
+    severity: HIGH
+    confidence: MEDIUM
+    action: ALERT_AND_BLOCK
+    description: >
+      Inbound connection to dynamic port 54979 from external IP, typical for Java remote code execution.
+      Malware often uses this vector to establish persistence.
+
+  - name: P2P_FILE_SHARING_PORTS
+    version: 1
+    protocol: TCP
+    direction: OUTBOUND
+    src_ip: "*"
+    dst_ip: "@external"
+    dst_port: "6881:6889"
+    window_sec: 60
+    threshold: 5
+    metric: COUNT
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Command and Control
+    mitre_technique: T1071
+    tags: p2p, bittorrent, file_sharing
+    severity: LOW
+    confidence: LOW
+    action: ALERT
+    description: >
+      Outbound connections to P2P file-sharing ports (6881-6889). 
+      While not always malicious, these are frequently used by malware for command and control.
+  
+  - name: TOR_NODE_COMM
+    version: 1
+    protocol: TCP
+    direction: OUTBOUND
+    src_ip: "*"
+    dst_ip: "@external"
+    dst_port: "9001"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Command and Control
+    mitre_technique: T1090
+    tags: tor, anonymity, suspicious
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Outbound connection to TCP port 9001, commonly used by Tor clients for directory information.
+      While not inherently malicious, it may indicate attempts to bypass security controls.
+
+  - name: TELNET_ACCESS
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@internal"
+    dst_port: "23"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: DST_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Initial Access
+    mitre_technique: T1021.004
+    tags: telnet, legacy, insecure_protocol
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Inbound connection to Telnet port (23). Telnet is an insecure protocol and its use
+      should be investigated immediately.
+
+  - name: FTP_WRITE_ACCESS
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@internal"
+    dst_port: "21"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: DST_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Initial Access
+    mitre_technique: T1021.003
+    tags: ftp, legacy, insecure_protocol
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Inbound connection to FTP port (21) from an external IP address. 
+      FTP is an insecure protocol and its use should be investigated immediately.
+
+  - name: RDP_TO_WORKSTATION
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@workstations"
+    dst_port: "3389"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: DST_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Initial Access
+    mitre_technique: T1133
+    tags: rdp, brute_force, external_access
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      Inbound RDP connection to a workstation. Workstations should not have direct
+      external RDP access. This is a common attack vector for lateral movement.
+      
+  - name: RDP_ANOMALY_MULTI_PORT
+    version: 1
+    protocol: TCP
+    direction: INBOUND
+    src_ip: "@external"
+    dst_ip: "@internal"
+    dst_port: "3389,5985,5986"  # RDP, WinRM HTTP/S
+    window_sec: 60
+    threshold: 3
+    metric: UNIQUE_PORTS
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Privilege Escalation
+    mitre_technique: T1078
+    tags: rdp, remote_execution, persistence
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Multiple distinct ports (RDP, WinRM) contacted from the same external source
+      to internal hosts within 60 seconds. Likely indicates an attacker attempting
+      to gain initial access and execute commands.
+
+  - name: SMB_TO_INTERNET
+    version: 1
+    protocol: TCP
+    direction: OUTBOUND
+    src_ip: "@internal"
+    dst_ip: "@external"
+    dst_port: "445"
+    window_sec: 60
+    threshold: 1
+    metric: COUNT
+    group_by: SRC_IP
+    decay: LINEAR
+    baseline_mode: STATIC
+    mitre_tactic: Lateral Movement
+    mitre_technique: T1021.002
+    tags: smb, lateral_movement, windows
+    severity: HIGH
+    confidence: HIGH
+    action: ALERT_AND_BLOCK
+    description: >
+      Internal host communicating with SMB port (445) on an external IP address. 
+      SMB should never be exposed to the internet.

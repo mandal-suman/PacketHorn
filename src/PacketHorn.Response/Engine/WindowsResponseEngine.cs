@@ -18,7 +18,7 @@ public class WindowsResponseEngine : IResponseEngine
         Action<string>? log = null)
     {
         _firewallController = firewallController;
-        _blockDurationSeconds = 15;
+        _blockDurationSeconds = Math.Max(1, blockDurationSeconds);
         _approvalCallback = approvalCallback;
         _log = log;
     }

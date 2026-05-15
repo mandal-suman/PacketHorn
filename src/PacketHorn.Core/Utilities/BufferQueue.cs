@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PacketHorn.Core.Utilities;
 
@@ -21,7 +22,7 @@ public class BufferQueue<T>
         return _queue.Take();
     }
 
-    public bool TryTake(out T item, int millisecondsTimeout = -1)
+    public bool TryTake([MaybeNullWhen(false)] out T item, int millisecondsTimeout = -1)
     {
         return _queue.TryTake(out item, millisecondsTimeout);
     }

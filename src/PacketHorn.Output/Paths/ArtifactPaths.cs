@@ -34,7 +34,7 @@ public sealed class ArtifactPaths
         var current = new DirectoryInfo(startDirectory);
         while (current != null)
         {
-            var hasMarker = File.Exists(Path.Combine(current.FullName, "PacketHorn.slnx"))
+            var hasMarker = File.Exists(Path.Combine(current.FullName, "PacketHorn.sln"))
                 || File.Exists(Path.Combine(current.FullName, "INSTRUCTIONS.md"));
 
             if (hasMarker)

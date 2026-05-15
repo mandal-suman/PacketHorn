@@ -1,7 +1,5 @@
 <div align="center">
 
-![PacketHorn Banner](docs/assets/banner.svg)
-
 # PacketHorn
 
 Terminal-native network detection and response for Windows, built with .NET 10.
@@ -91,7 +89,7 @@ Recommended Npcap installer options:
 
 ```powershell
 dotnet restore
-dotnet build PacketHorn.slnx
+dotnet build PacketHorn.sln -m:1
 ```
 
 ### Run

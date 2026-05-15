@@ -315,3 +315,23 @@ signatures:
     confidence: HIGH
     action: ALERT
     description: High-rate inbound SYN packets from single source.
+
+  - name: ICMP_PING_TEST # For Testing Purpose
+    version: 1
+    protocol: ICMP
+    direction: ANY
+    src_ip: "*"
+    dst_ip: "*"
+    src_port: "*"
+    dst_port: "*"
+    flag_match: ""
+    flag_mask: ""
+    payload_pattern: ""
+    count: 5
+    window_sec: 10
+    threshold_mode: PER_SRC
+    severity: LOW
+    confidence: HIGH
+    action: ALERT
+    description: >
+      Test rule for repeated ICMP echo requests.

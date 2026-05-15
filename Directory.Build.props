@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BuildInParallel>false</BuildInParallel>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+</Project>

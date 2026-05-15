@@ -45,7 +45,12 @@ dotnet restore
 ## Build
 
 ```powershell
-dotnet build PacketHorn.slnx
+dotnet build PacketHorn.sln -m:1
+```
+You can also run the repository helper:
+
+```powershell
+.\build.ps1
 ```
 
 ## Run
